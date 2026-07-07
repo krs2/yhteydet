@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yhteydet — sanapeli</title>
+<style>
+  :root{
+    --paper: #f6f2ea;
+    --ink: #1f2b23;
+    --ink-soft: #55645a;
+    --line: #d9d2c2;
+    --card: #ffffff;
+    --card-border: #e3dcc9;
+
+    --c1: #d99a3c;   /* amber   */
+    --c1-soft: #f4dfb4;
+    --c2: #4c7a5e;   /* moss    */
+    --c2-soft: #cfe1d3;
+    --c3: #3b6e93;   /* sky     */
+    --c3-soft: #cddfe9;
+    --c4: #7a4f74;   /* heather */
+    --c4-soft: #e2d2df;
+
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Georgia", serif;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 16px 60px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .logo {
+    font-family: "Georgia", serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 34px;
+    letter-spacing: 0.5px;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .logo span {
+    color: var(--c1);
+  }
+
+  .sub {
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.4px;
+    margin-top: 2px;
+  }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 22px 0 4px;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--ink);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .nav-btn:hover:not(:disabled) { background: var(--line); }
+  .nav-btn:disabled { color: var(--line); cursor: default; }
+
+  .puzzle-title {
+    font-weight: 700;
+    font-size: 17px;
+    min-width: 170px;
+    text-align: center;
+  }
+
+  .date-row {
+    text-align: center;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin-bottom: 26px;
+  }
+
+  .instructions {
+    text-align: center;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .solved-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    border-radius: var(--radius);
+    padding: 14px 10px;
+    text-align: center;
+    animation: reveal 0.45s ease;
+  }
+
+  .solved-row .cat-label {
+    grid-column: 1 / -1;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.75;
+  }
+
+  .solved-row .word {
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 10px 4px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.55);
+  }
+
+  @keyframes reveal {
+    from { transform: scale(0.96); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  .tile {
+    background: var(--card);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius);
+    aspect-ratio: 1.35 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px;
+    cursor: pointer;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--ink);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  }
+
+  .tile.selected {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .tile.shake {
+    animation: shake 0.4s;
+  }
+
+  .tile.pop {
+    animation: pop 0.35s;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  .hearts {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 20px;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .heart { color: var(--c4); font-size: 16px; }
+  .heart.spent { color: var(--line); }
+
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  .btn {
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 11px 20px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, opacity 0.15s;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+
+  .btn.primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn.primary:hover:not(:disabled) { opacity: 0.85; }
+
+  .btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .btn:disabled:hover { background: transparent; color: var(--ink); }
+
+  .message {
+    text-align: center;
+    min-height: 24px;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 14px;
+    color: var(--c2);
+  }
+
+  .end-screen {
+    text-align: center;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    margin-top: 8px;
+  }
+
+  .end-screen h2 {
+    font-family: "Georgia", serif;
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+
+  .end-screen p {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin-top: 0;
+  }
+
+  footer {
+    margin-top: 40px;
+    text-align: center;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 420px) {
+    .tile { font-size: 12px; }
+    .solved-row .word { font-size: 11px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--c3);
+    outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="logo">Yhteydet<span>+</span></p>
+    <p class="sub">löydä neljä neljän sanan ryhmää</p>
+  </header>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="prevBtn" aria-label="Edellinen palapeli">&#8249;</button>
+    <div class="puzzle-title" id="puzzleTitle"></div>
+    <button class="nav-btn" id="nextBtn" aria-label="Seuraava palapeli">&#8250;</button>
+  </div>
+  <div class="date-row" id="puzzleDate"></div>
+
+  <p class="instructions">Valitse neljä korttia, jotka kuuluvat yhteen, ja paina&nbsp;<strong>Vahvista</strong>. Sinulla on neljä yritystä.</p>
+
+  <div class="message" id="message"></div>
+
+  <div class="board" id="board"></div>
+
+  <div class="hearts" id="hearts"></div>
+
+  <div class="btn-row" id="btnRow">
+    <button class="btn" id="deselectBtn">Tyhjennä valinnat</button>
+    <button class="btn" id="shuffleBtn">Sekoita</button>
+    <button class="btn primary" id="submitBtn" disabled>Vahvista</button>
+  </div>
+
+  <div class="end-screen" id="endScreen" style="display:none;"></div>
+
+  <footer>Tehty huviksesi &middot; sanat ja ryhmät ovat koodissa</footer>
+</div>
+
+<script>
+/* ============================================================
+   PALAPELIT — lisää tähän omia palapelejä samalla rakenteella.
+   Jokaisessa palapelissä on 4 ryhmää, joissa on 4 sanaa/ilmaisua.
+   "color" viittaa CSS-muuttujiin --c1..--c4 (ja niiden --soft-versioihin).
+   ============================================================ */
+const PUZZLES = [
+  {
+    id: 1,
+    date: "2026-06-29",
+    groups: [
+      {
+        category: "Muumi-hahmoja",
+        color: 1,
+        words: ["MUUMIPEIKKO", "NUUSKAMUIKKUNEN", "NIISKUNEITI", "PIKKU MYY"]
+      },
+      {
+        category: "Suomen suurimpia järviä",
+        color: 2,
+        words: ["SAIMAA", "PÄIJÄNNE", "INARI", "OULUJÄRVI"]
+      },
+      {
+        category: "___ KELLO",
+        color: 3,
+        words: ["HERÄTYS", "PÖYTÄ", "TASKU", "KIRKON"]
+      },
+      {
+        category: "Sanoja, joissa on AAMU",
+        color: 4,
+        words: ["AAMUPALA", "AAMUNKOITTO", "AAMUTAKKI", "AAMUYÖ"]
+      }
+    ]
+  },
+  {
+    id: 2,
+    date: "2026-07-07",
+    groups: [
+      {
+        category: "Lintulajeja",
+        color: 1,
+        words: ["KUOVI", "TIKLI", "HAAHKA", "PYRSTÖTIAINEN"]
+      },
+      {
+        category: "Kahvin ystäviä",
+        color: 2,
+        words: ["MAITO", "KARDEMUMMA", "PULLA", "SOKERI"]
+      },
+      {
+        category: "___ MERKKI",
+        color: 3,
+        words: ["VÄLI", "KYSYMYS", "TAVARA", "AJATUSVIIVA"]
+      },
+      {
+        category: "Sanoja, joissa on VUOSI",
+        color: 4,
+        words: ["VUOSISATA", "VUOSIKERTA", "VUOSIPÄIVÄ", "VUOSILOMA"]
+      }
+    ]
+  }
+];
+
+/* ============================================================
+   PELILOGIIKKA
+   ============================================================ */
+
+let puzzleIndex = PUZZLES.length - 1; // aloita viimeisimmästä
+let words = [];          // { text, groupIdx }
+let selected = [];        // indeksit words-taulukossa
+let solvedGroups = [];    // ratkaistujen ryhmien indeksit, ratkaisujärjestyksessä
+let mistakesLeft = 4;
+let gameOver = false;
+
+const boardEl = document.getElementById("board");
+const heartsEl = document.getElementById("hearts");
+const messageEl = document.getElementById("message");
+const submitBtn = document.getElementById("submitBtn");
+const deselectBtn = document.getElementById("deselectBtn");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const btnRow = document.getElementById("btnRow");
+const endScreenEl = document.getElementById("endScreen");
+const puzzleTitleEl = document.getElementById("puzzleTitle");
+const puzzleDateEl = document.getElementById("puzzleDate");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function formatDate(iso) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("fi-FI", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function loadPuzzle(idx) {
+  puzzleIndex = idx;
+  const puzzle = PUZZLES[puzzleIndex];
+
+  words = [];
+  puzzle.groups.forEach((g, gi) => {
+    g.words.forEach(w => words.push({ text: w, groupIdx: gi }));
+  });
+  words = shuffle(words);
+
+  selected = [];
+  solvedGroups = [];
+  mistakesLeft = 4;
+  gameOver = false;
+
+  puzzleTitleEl.textContent = "Palapeli #" + puzzle.id;
+  puzzleDateEl.textContent = formatDate(puzzle.date);
+
+  prevBtn.disabled = puzzleIndex === 0;
+  nextBtn.disabled = puzzleIndex === PUZZLES.length - 1;
+
+  messageEl.textContent = "";
+  endScreenEl.style.display = "none";
+  btnRow.style.display = "flex";
+
+  renderHearts();
+  renderBoard();
+}
+
+function renderHearts() {
+  heartsEl.innerHTML = "";
+  for (let i = 0; i < 4; i++) {
+    const span = document.createElement("span");
+    span.className = "heart" + (i < mistakesLeft ? "" : " spent");
+    span.innerHTML = "&#9829;";
+    heartsEl.appendChild(span);
+  }
+}
+
+function renderBoard() {
+  boardEl.innerHTML = "";
+
+  // ratkaistut ryhmät ylimpänä, ratkaisujärjestyksessä
+  solvedGroups.forEach(gi => {
+    const g = PUZZLES[puzzleIndex].groups[gi];
+    const row = document.createElement("div");
+    row.className = "solved-row";
+    row.style.background = `var(--c${g.color}-soft)`;
+    row.style.border = `1.5px solid var(--c${g.color})`;
+
+    const label = document.createElement("div");
+    label.className = "cat-label";
+    label.style.color = `var(--c${g.color})`;
+    label.textContent = g.category;
+    row.appendChild(label);
+
+    g.words.forEach(w => {
+      const wordEl = document.createElement("div");
+      wordEl.className = "word";
+      wordEl.textContent = w;
+      row.appendChild(wordEl);
+    });
+
+    boardEl.appendChild(row);
+  });
+
+  // jäljellä olevat sanat
+  words.forEach((w, idx) => {
+    if (solvedGroups.includes(w.groupIdx)) return;
+
+    const tile = document.createElement("button");
+    tile.className = "tile" + (selected.includes(idx) ? " selected" : "");
+    tile.textContent = w.text;
+    tile.type = "button";
+    tile.addEventListener("click", () => toggleSelect(idx));
+    boardEl.appendChild(tile);
+  });
+
+  submitBtn.disabled = selected.length !== 4 || gameOver;
+}
+
+function toggleSelect(idx) {
+  if (gameOver) return;
+  const pos = selected.indexOf(idx);
+  if (pos >= 0) {
+    selected.splice(pos, 1);
+  } else {
+    if (selected.length >= 4) return;
+    selected.push(idx);
+  }
+  renderBoard();
+}
+
+function checkSelection() {
+  if (selected.length !== 4 || gameOver) return;
+
+  const groupIdxs = selected.map(i => words[i].groupIdx);
+  const allSame = groupIdxs.every(g => g === groupIdxs[0]);
+
+  if (allSame) {
+    const gi = groupIdxs[0];
+    solvedGroups.push(gi);
+    selected = [];
+    messageEl.textContent = "Löytyi! " + PUZZLES[puzzleIndex].groups[gi].category;
+    renderBoard();
+
+    if (solvedGroups.length === 4) {
+      finishGame(true);
+    }
+  } else {
+    // tarkista "yksi väärässä" -vihje
+    const counts = {};
+    groupIdxs.forEach(g => counts[g] = (counts[g] || 0) + 1);
+    const maxCount = Math.max(...Object.values(counts));
+
+    mistakesLeft--;
+    renderHearts();
+
+    selected.forEach(idx => {
+      const tileEls = boardEl.querySelectorAll(".tile.selected");
+      tileEls.forEach(t => {
+        t.classList.add("shake");
+        setTimeout(() => t.classList.remove("shake"), 400);
+      });
+    });
+
+    if (maxCount === 3) {
+      messageEl.textContent = "Lähellä! Yksi sanoista kuuluu muualle.";
+    } else {
+      messageEl.textContent = "Ei mennyt yhteen. Yritä uudelleen.";
+    }
+
+    if (mistakesLeft <= 0) {
+      setTimeout(() => finishGame(false), 500);
+    }
+  }
+}
+
+function finishGame(won) {
+  gameOver = true;
+  btnRow.style.display = "none";
+  messageEl.textContent = "";
+
+  // näytä loput ryhmät jos hävittiin
+  if (!won) {
+    for (let gi = 0; gi < 4; gi++) {
+      if (!solvedGroups.includes(gi)) solvedGroups.push(gi);
+    }
+    selected = [];
+    renderBoard();
+  }
+
+  endScreenEl.style.display = "block";
+  endScreenEl.innerHTML = won
+    ? `<h2>Kaikki neljä löytyi!</h2><p>Käytit ${4 - mistakesLeft} virhettä.</p>
+       <button class="btn primary" id="restartBtn">Pelaa uudelleen</button>`
+    : `<h2>Yritykset loppuivat</h2><p>Tässä olivat oikeat ryhmät.</p>
+       <button class="btn primary" id="restartBtn">Pelaa uudelleen</button>`;
+
+  document.getElementById("restartBtn").addEventListener("click", () => loadPuzzle(puzzleIndex));
+}
+
+submitBtn.addEventListener("click", checkSelection);
+
+deselectBtn.addEventListener("click", () => {
+  selected = [];
+  renderBoard();
+});
+
+shuffleBtn.addEventListener("click", () => {
+  selected = [];
+  const solvedSet = new Set(solvedGroups);
+  const remainingIdx = words
+    .map((w, i) => i)
+    .filter(i => !solvedSet.has(words[i].groupIdx));
+
+  const remainingWords = remainingIdx.map(i => words[i]);
+  const shuffled = shuffle(remainingWords);
+
+  let si = 0;
+  for (let i = 0; i < words.length; i++) {
+    if (!solvedSet.has(words[i].groupIdx)) {
+      words[i] = shuffled[si++];
+    }
+  }
+  // selected-indeksit viittaavat sanoihin, ei kortin sijaintiin, mutta
+  // koska sekoitamme myös vastaavat objektit, pidä valinnat ennallaan.
+  renderBoard();
+});
+
+prevBtn.addEventListener("click", () => {
+  if (puzzleIndex > 0) loadPuzzle(puzzleIndex - 1);
+});
+nextBtn.addEventListener("click", () => {
+  if (puzzleIndex < PUZZLES.length - 1) loadPuzzle(puzzleIndex + 1);
+});
+
+// käynnistä
+loadPuzzle(puzzleIndex);
+</script>
+</body>
+</html>
