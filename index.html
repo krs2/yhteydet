@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<title>Yhteydet — sanapeli</title>
+<title>Inkalle</title>
 <style>
   :root{
     --paper: #f6f2ea;
@@ -361,8 +361,8 @@
 
 <div class="wrap">
   <header>
-    <p class="logo">Yhteydet<span>+</span></p>
-    <p class="sub">löydä neljä neljän ryhmää</p>
+    <p class="logo">INKALLE<span>♡</span></p>
+    <p class="sub">Luo neljä neljän ryhmää</p>
   </header>
 
   <div class="nav-row">
@@ -385,7 +385,7 @@
 
   <div class="end-screen" id="endScreen" style="display:none;"></div>
 
-  <footer>Tehty huviksesi &middot; sanat ja ryhmät ovat koodissa</footer>
+  <footer></footer>
 </div>
 
 <script>
@@ -504,7 +504,7 @@ function loadPuzzle(idx) {
   mistakesLeft = 4;
   gameOver = false;
 
-  puzzleTitleEl.textContent = "Palapeli #" + puzzle.id;
+  //puzzleTitleEl.textContent = "Palapeli #" + puzzle.id;
   puzzleDateEl.textContent = formatDate(puzzle.date);
 
   prevBtn.disabled = puzzleIndex === 0;
