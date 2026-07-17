@@ -616,9 +616,9 @@ function checkSelection() {
     });
 
     if (maxCount === 3) {
-      messageEl.textContent = "Lähellä! Yksi sanoista kuuluu muualle.";
+      messageEl.textContent = "Yksi väärin.";
     } else {
-      messageEl.textContent = "Ei mennyt yhteen. Yritä uudelleen.";
+      messageEl.textContent = "Yritä uudelleen.";
     }
 
     if (mistakesLeft <= 0) {
@@ -643,7 +643,7 @@ function finishGame(won) {
 
   endScreenEl.style.display = "block";
   endScreenEl.innerHTML = won
-    ? `<h2>Kaikki neljä löytyi!</h2><p>Käytit ${4 - mistakesLeft} virhettä.</p>
+    ? `<h2>Kaikki neljä löytyi!</h2><p>Teit ${4 - mistakesLeft} virhettä.</p>
        <button class="btn primary" id="restartBtn">Pelaa uudelleen</button>`
     : `<h2>Yritykset loppuivat</h2><p>Tässä olivat oikeat ryhmät.</p>
        <button class="btn primary" id="restartBtn">Pelaa uudelleen</button>`;
